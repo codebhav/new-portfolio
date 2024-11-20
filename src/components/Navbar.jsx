@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
     return (
@@ -16,30 +16,51 @@ const SlideTabs = () => {
         width: 0,
         opacity: 0,
     });
+    const [activeTab, setActiveTab] = useState(null);
+    const navigate = useNavigate();
+
+    const handleMouseLeave = () => {
+        setPosition((pv) => ({
+            ...pv,
+            opacity: 0,
+        }));
+        setActiveTab(null);
+    };
+
+    const handleClick = () => {
+        if (activeTab) {
+            navigate(activeTab);
+        }
+    };
 
     return (
         <ul
-            onMouseLeave={() => {
-                setPosition((pv) => ({
-                    ...pv,
-                    opacity: 0,
-                }));
-            }}
+            onMouseLeave={handleMouseLeave}
+            onClick={handleClick}
             className="relative mx-auto flex w-fit rounded-full border-2 border-zinc-400 bg-zinc-800 p-1"
         >
-            <Tab to="/" setPosition={setPosition}>
+            <Tab to="/" setPosition={setPosition} setActiveTab={setActiveTab}>
                 Home
             </Tab>
-            {/* <Tab to="/projects" setPosition={setPosition}>
-                Projects
-            </Tab> */}
-            <Tab to="/blog" setPosition={setPosition}>
+            <Tab
+                to="/blog"
+                setPosition={setPosition}
+                setActiveTab={setActiveTab}
+            >
                 Blog
             </Tab>
-            <Tab to="/photos" setPosition={setPosition}>
+            <Tab
+                to="/photos"
+                setPosition={setPosition}
+                setActiveTab={setActiveTab}
+            >
                 Photos
             </Tab>
-            <Tab to="/contact" setPosition={setPosition}>
+            <Tab
+                to="/contact"
+                setPosition={setPosition}
+                setActiveTab={setActiveTab}
+            >
                 Contact
             </Tab>
 
@@ -48,7 +69,7 @@ const SlideTabs = () => {
     );
 };
 
-const Tab = ({ children, setPosition, to }) => {
+const Tab = ({ children, setPosition, setActiveTab, to }) => {
     const ref = useRef(null);
 
     return (
@@ -64,14 +85,15 @@ const Tab = ({ children, setPosition, to }) => {
                     width,
                     opacity: 1,
                 });
+                setActiveTab(to);
             }}
             className="relative z-10 block cursor-pointer px-3 py-1.5 text-xs uppercase text-white mix-blend-difference md:px-5 md:py-2 md:text-base"
         >
-            {/* Use the Link component for routing */}
-            <Link to={to}>{children}</Link>
+            {children}
         </li>
     );
 };
+
 const Cursor = ({ position }) => {
     return (
         <motion.li
