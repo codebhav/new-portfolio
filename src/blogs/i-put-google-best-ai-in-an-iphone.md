@@ -1,6 +1,6 @@
 ---
 title: "I Put Google's Best AI in an iPhone"
-imgUrl: "/src/assets/blog-images/i-put-googles-best-ai-in-an-iphone.jpg"
+imgUrl: "src/assets/blog-images/i-put-googles-best-ai-in-an-iphone.jpg"
 publishedAt: "Jan 18, 2024"
 summary: "I created a Siri Shortcut that integrates the Gemini Pro API to build a more advanced AI assistant than Siri."
 ---

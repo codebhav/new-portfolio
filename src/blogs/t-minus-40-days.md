@@ -1,6 +1,6 @@
 ---
 title: "T-minus 40 Days"
-imgUrl: "/src/assets/blog-images/default.png"
+imgUrl: "src/assets/blog-images/default.png"
 publishedAt: "Apr 23, 2023"
 summary: "I'm feeling anxious about graduating college in 40 days and leaving behind my college friends and lifestyle. I reflect on how the fleeting nature of life's phases, both happy and sad, is what makes the present moment special. I express pride and support for my friends who are now navigating adulthood, and I hope they will remember me fondly in the future, even as our lives change."
 ---

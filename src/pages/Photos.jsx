@@ -107,27 +107,70 @@ const PhotoGrid = () => {
 
         const loadPhotos = async () => {
             const photosList = [];
-            // Try loading photos from 001 to 999
-            for (let i = 1; i <= 999; i++) {
-                const num = i.toString().padStart(3, '0');
-                const extensions = ['jpg', 'png', 'jpeg'];
-                
-                for (const ext of extensions) {
-                    const url = `/photos/photo${num}.${ext}`;
-                    const exists = await checkImage(url);
-                    if (exists) {
-                        photosList.push({
-                            id: num,
-                            url,
-                            alt: `Photo ${num}`
-                        });
-                        break;
-                    }
+            let consecutiveFailures = 0;
+            const MAX_FAILURES = 3; // Stop after 3 consecutive missing photos
+            const BATCH_SIZE = 5; // Check 5 photos at a time
+            let i = 1;
+
+            while (consecutiveFailures < MAX_FAILURES) {
+                const batchPromises = [];
+
+                // Create a batch of promises
+                for (
+                    let j = 0;
+                    j < BATCH_SIZE && consecutiveFailures < MAX_FAILURES;
+                    j++
+                ) {
+                    const num = (i + j).toString().padStart(3, "0");
+                    const extensions = ["jpg", "png", "jpeg"];
+
+                    // Create promises for each extension of this photo number
+                    const photoPromises = extensions.map((ext) => ({
+                        url: `/photos/photo${num}.${ext}`,
+                        id: num,
+                        promise: checkImage(`/photos/photo${num}.${ext}`),
+                    }));
+
+                    batchPromises.push(
+                        Promise.any(
+                            photoPromises.map(async (p) => {
+                                const exists = await p.promise;
+                                if (exists)
+                                    return {
+                                        id: p.id,
+                                        url: p.url,
+                                        alt: `Photo ${p.id}`,
+                                    };
+                                throw new Error("Not found");
+                            })
+                        ).catch(() => null)
+                    );
                 }
+
+                // Wait for all promises in the batch to resolve
+                const results = await Promise.all(batchPromises);
+
+                // Process results
+                let batchHasValidPhoto = false;
+                results.forEach((result) => {
+                    if (result) {
+                        batchHasValidPhoto = true;
+                        consecutiveFailures = 0;
+                        photosList.push(result);
+                    } else {
+                        if (!batchHasValidPhoto) consecutiveFailures++;
+                    }
+                });
+
+                i += BATCH_SIZE;
+
+                // Optional: Set a hard limit
+                if (i > 50) break; // Maximum of 50 photos
             }
+
             // Sort photos in reverse order (newest first)
-            const sortedPhotos = photosList.sort((a, b) => 
-                parseInt(b.id) - parseInt(a.id)
+            const sortedPhotos = photosList.sort(
+                (a, b) => parseInt(b.id) - parseInt(a.id)
             );
             setPhotos(sortedPhotos);
             setLoading(false);
